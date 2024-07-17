@@ -12,6 +12,13 @@ cd example-python-project
 pip install -r requirements.txt
 ```
 
+## How to run
+
+```
+$ python3 nlp4j-embedding-server-e5.py
+```
+
+## How to call
 
 ```
 http://127.0.0.1:8888/?text=これはテストです。
