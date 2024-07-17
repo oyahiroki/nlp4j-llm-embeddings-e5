@@ -8,7 +8,7 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/oyahiroki/nlp4j-llm-embeddings-e5.git
-cd example-python-project
+cd nlp4j-llm-embeddings-e5
 pip install -r requirements.txt
 ```
 
