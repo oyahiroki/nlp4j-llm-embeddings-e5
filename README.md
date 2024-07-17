@@ -36,6 +36,46 @@ curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテス
 Expected response: {"message": "ok", "time": "2024-05-26T23:21:38", "text": "これはテストです。", "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ... 0.022928446531295776]}
 ```
 
+
+## REST API
+
+The REST API interface allows this server to be easily accessed from applications written in different programming languages. This interoperability makes it highly versatile for various development environments.
+
+- **GET Request**:
+  ```bash
+  curl "http://127.0.0.1:8888/?text=これはテストです。"
+  ```
+  This request sends a text query to the server, which responds with the processed embeddings.
+
+- **POST Request**:
+  ```bash
+  curl -X POST -H "Content-Type: application/json" -d '{"text":"これはテストです。"}' http://127.0.0.1:8888/
+  ```
+  This sends a JSON payload with the text to be processed, and the server responds with a JSON containing the embeddings.
+
+### Sample Response
+The response JSON includes the status message, current timestamp, the input text, and its corresponding sentence embeddings:
+```json
+{
+  "message": "ok",
+  "time": "2024-05-26T23:21:38",
+  "text": "これはテストです。",
+  "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ... 0.022928446531295776]
+}
+```
+
+### Benefits of REST API Integration
+
+- **Language Agnostic**: The REST API allows the server to be accessed from any programming language that can make HTTP requests, including JavaScript, Java, C#, Ruby, and more.
+- **Ease of Use**: Developers can integrate text processing capabilities into their applications without needing to understand the underlying Python code.
+- **Scalability**: The multithreaded nature of the server ensures it can handle multiple requests concurrently, making it suitable for production environments.
+
+### Conclusion
+
+This script demonstrates a straightforward yet powerful approach to creating a text processing server using Python. By leveraging the `sentence-transformers` library for generating embeddings and implementing a multithreaded HTTP server with a REST API interface, it efficiently handles text input and produces valuable output. The REST API integration ensures that this server can be seamlessly used from various programming languages and platforms, making it a versatile tool for a wide range of natural language processing tasks.
+
+
+
 ## Resources
 
 ```
