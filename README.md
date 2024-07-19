@@ -76,7 +76,7 @@ This script demonstrates a straightforward yet powerful approach to creating a t
 
 
 
-## Resources
+## Example of Resources
 
 ```
 $ ps aux | grep python
@@ -107,5 +107,14 @@ Thu Jul 18 01:03:18 2024
 |    0   N/A  N/A       832      C   /python3.10                                 N/A      |
 +-----------------------------------------------------------------------------------------+
 $
+```
+
+The time taken for embedding was 2.5 seconds when using the NVIDIA GeForce RTX 3060 Ti.
+
+```
+$ curl -w"time_total: %{time_total}\n" -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテストです。\"}" http://127.0.0.1:8888/
+{"message": "ok", "time": "2024-07-19T16:25:52", "text": "\u3053\u308c\u306f\u30c6\u30b9\u30c8\u3067\u3059\u3002", "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, -0.057356465607881546, 0.033991988748311996, -0.023742299526929855, 0.006811152212321758, 0.08303837478160858, 0.04199839010834694, ... -0.02498556673526764, -0.03213634714484215, 0.022928446531295776]}time_total: 2.594760
+
+
 ```
 
