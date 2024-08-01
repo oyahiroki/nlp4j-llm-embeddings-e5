@@ -8,14 +8,20 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/oyahiroki/nlp4j-llm-embeddings-e5.git
+```
+
+```sh
 cd nlp4j-llm-embeddings-e5
+```
+
+```sh
 pip install -r requirements.txt
 ```
 
 ## How to run
 
 ```
-$ python3 nlp4j-embedding-server-e5.py
+python3 nlp4j-embedding-server-e5.py
 ```
 
 ## How to call
@@ -23,13 +29,13 @@ $ python3 nlp4j-embedding-server-e5.py
 ### GET (unencoded)
 
 ```
-http://127.0.0.1:8888/?text=これはテストです。
+curl http://127.0.0.1:8888/?text=これはテストです。
 ```
 
 ### GET (URL encoded)
 
 ```
-http://127.0.0.1:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
+curl http://127.0.0.1:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
 ```
 
 ### POST (Request body is JSON)
@@ -37,6 +43,13 @@ http://127.0.0.1:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%
 ```
 curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテストです。\"}" http://127.0.0.1:8888/
 ```
+
+### POST (Request body is URL Encoded)
+
+```
+curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82\"}" http://127.0.0.1:8888/
+```
+
 
 ### Expected response
 
