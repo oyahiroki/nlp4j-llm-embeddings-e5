@@ -1,3 +1,9 @@
+# What is Multilingual E5 Embedding?
+
+The Multilingual E5 Embedding, available on Hugging Face, is a large-scale language model designed for feature extraction in 94 languages. It uses a base of XLM-RoBERTa, trained on a diverse set of multilingual datasets, enhancing text encoding capabilities for various tasks like text retrieval and semantic similarity. The model achieves high performance across a variety of benchmarks, particularly in multilingual environments, and is implemented with PyTorch and compatible with Sentence Transformers for easy integration into applications.
+
+For more details, you can view the full description on [the Hugging Face page](https://huggingface.co/intfloat/multilingual-e5-large) .
+
 # nlp4j-llm-embeddings-e5
 
 nlp4j-llm-embeddings-e5
