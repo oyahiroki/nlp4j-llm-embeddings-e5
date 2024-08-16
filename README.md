@@ -4,6 +4,8 @@ The Multilingual E5 Embedding, available on Hugging Face, is a large-scale langu
 
 For more details, you can view the full description on [the Hugging Face page](https://huggingface.co/intfloat/multilingual-e5-large) .
 
+Hugging FaceのMultilingual E5 Embeddingは、94言語をサポートする大規模言語モデルです。XLM-RoBERTaを基にしており、多様な多言語データセットを使用して訓練されています。このモデルは、テキスト検索や意味的類似性の評価に優れた性能を示しています。PyTorchで実装されており、Sentence Transformersとの互換性もあります。さらに詳しい情報は、Hugging Faceのページで確認できます。
+
 # nlp4j-llm-embeddings-e5
 
 nlp4j-llm-embeddings-e5
