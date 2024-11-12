@@ -1,85 +1,97 @@
-import time
-import psutil
-import torch
-from transformers import AutoTokenizer, AutoModel
+# coding: utf-8
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from socketserver import ThreadingMixIn
+from urllib.parse import urlparse, parse_qs, unquote
 import json
-import signal
+import traceback
+from socketserver import ThreadingMixIn
 import sys
+import time
 import datetime
-
-# モデルとトークナイザーの読み込み
-MODEL_NAME = "intfloat/multilingual-e5-large"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModel.from_pretrained(MODEL_NAME)
-
-# デバイス設定 (GPU があれば使用)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+import signal
+from sentence_transformers import SentenceTransformer
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+def sig_handler(signum, frame) -> None:
+    sys.exit(1)
+
+print("initializing ... 1/2")
+model = SentenceTransformer('intfloat/multilingual-e5-large')  # モデルの一度きりの初期化
+print("initializing ... 2/2")
+model.encode(["test"])
+print("initializing ... done")
+
+print("http://localhost:8888/?text=これはテストです。")
+print("http://localhost:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82")
+print("curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"text\\\":\\\"これはテストです。\\\"}\" http://" + address[0] + ":" + str(address[1]) + "/")
+print("Expected response: " + '{"message": "ok", "time": "2024-05-26T23:21:38", "text": "\u3053\u308c\u306f\u30c6\u30b9\u30c8\u3067\u3059\u3002", "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ... 0.022928446531295776]}')
+
 class HelloHttpRequestHandler(BaseHTTPRequestHandler):
+    count = 0
 
     def log_message(self, format, *args):
         pass
-
-    def get_embeddings(self, texts):
-        """テキストの埋め込みを取得する"""
-        process = psutil.Process()
-        initial_memory = process.memory_info().rss / (1024 ** 2)  # 初期メモリ使用量 (MB)
-
-        # 埋め込み処理
-        start_time = time.time()
-        inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
-        with torch.no_grad():
-            embeddings = model(**inputs).last_hidden_state.mean(dim=1).cpu().tolist()
-        end_time = time.time()
-
-        final_memory = process.memory_info().rss / (1024 ** 2)  # 最終メモリ使用量 (MB)
-
-        # パフォーマンスのログ
-        print(f"処理時間: {end_time - start_time:.2f} 秒")
-        print(f"メモリ使用量: {final_memory - initial_memory:.2f} MB 増加")
-
-        return embeddings
-
+    
     def myProcess(self, text):
+        HelloHttpRequestHandler.count += 1
         try:
-            res = {
-                "message": "ok",
-                "time": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-                "text": text,
-                "embeddings": self.get_embeddings([text])[0]
-            }
+            time1 = time.time()
+            res = {"message": "ok", "time": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "text": text}
+            sentences = [text]
+            
+            # Embedding処理の時間計測開始
+            embed_start_time = time.time()
+            embeddings = model.encode(sentences)  # グローバルモデル変数を使用
+            embed_end_time = time.time()
+            # Embedding処理の時間計測終了
+            
+            res["embeddings"] = embeddings.tolist()[0]
 
             self.send_response(200)
             self.send_header("Content-type", "application/json; charset=utf-8")
             self.end_headers()
-            self.wfile.write(json.dumps(res).encode())
-        except Exception as e:
-            self.send_response(500)
-            self.end_headers()
-            print("Error:", e)
+            html = json.dumps(res)
+            self.wfile.write(html.encode())
+            self.close_connection = True
 
-    def do_POST(self):
-        try:
-            content_length = int(self.headers.get('content-length'))
-            requestbody = json.loads(self.rfile.read(content_length).decode('utf-8'))
-            text = requestbody.get('text')
-            self.myProcess(text)
+            time2 = time.time()
+            
+            # 処理時間の出力
+            print("Embedding Time: {:.6f} seconds".format(embed_end_time - embed_start_time))
+            
+            del html, res, time2, time1
         except Exception as e:
+            print(traceback.format_exc())
             self.send_response(500)
+    
+    def do_POST(self):
+        content_length = int(self.headers.get('content-length'))
+        request_body = json.loads(self.rfile.read(content_length).decode('utf-8'))
+        text = request_body.get('text')
+        self.myProcess(text)
+    
+    def do_GET(self):
+        query = urlparse(self.path).query
+        qs_d = parse_qs(query)
+        if "text" not in qs_d:
+            self.send_response(404)
             self.end_headers()
-            print("Error:", e)
+            return
+        text = qs_d["text"][0]
+        text = unquote(text)
+        self.myProcess(text)
 
 class HelloHttpServer(ThreadingMixIn, HTTPServer):
     pass
 
 def main():
+    signal.signal(signal.SIGTERM, sig_handler)
     ip = '127.0.0.1'
     port = 8888
+    args = sys.argv[1:]
+    if len(args) == 1:
+        port = int(args[0])
     server = HelloHttpServer((ip, port), HelloHttpRequestHandler)
     try:
         server.serve_forever()
