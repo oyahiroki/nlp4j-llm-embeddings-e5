@@ -1,90 +1,81 @@
-# What is Multilingual E5 Embedding?
+# Multilingual E5 Embedding Server
 
-The Multilingual E5 Embedding, available on Hugging Face, is a large-scale language model designed for feature extraction in 94 languages. It uses a base of XLM-RoBERTa, trained on a diverse set of multilingual datasets, enhancing text encoding capabilities for various tasks like text retrieval and semantic similarity. The model achieves high performance across a variety of benchmarks, particularly in multilingual environments, and is implemented with PyTorch and compatible with Sentence Transformers for easy integration into applications.
 
-For more details, you can view the full description on [the Hugging Face page](https://huggingface.co/intfloat/multilingual-e5-large) .
+##nlp4j-llm-embeddings-e5
 
-Hugging FaceのMultilingual E5 Embeddingは、94言語をサポートする大規模言語モデルです。XLM-RoBERTaを基にしており、多様な多言語データセットを使用して訓練されています。このモデルは、テキスト検索や意味的類似性の評価に優れた性能を示しています。PyTorchで実装されており、Sentence Transformersとの互換性もあります。さらに詳しい情報は、Hugging Faceのページで確認できます。
-
-# nlp4j-llm-embeddings-e5
-
-nlp4j-llm-embeddings-e5
+A lightweight, REST API-powered server for generating multilingual embeddings using the E5 model. This server is built with sentence-transformers and provides an easy-to-use interface for text processing tasks.
 
 ## Installation
 
+To get started, follow these steps:
+
 Clone the repository:
 
-```sh
+```
 git clone https://github.com/oyahiroki/nlp4j-llm-embeddings-e5.git
 ```
 
-```sh
+Navigate to the project directory:
+
+```
 cd nlp4j-llm-embeddings-e5
 ```
 
-```sh
+Install the required dependencies:
+
+```
 pip install -r requirements.txt
 ```
 
-## How to run
+## How to Run
+
+Start the server with the following command:
 
 ```
 python3 nlp4j-embedding-server-e5.py
 ```
 
-## How to call
+## API Usage
 
-### GET (unencoded)
+The server provides a REST API for sending text and receiving its embeddings. Below are usage examples for GET and POST requests.
+
+### GET Request (Plain Text)
+
+Send a plain text query without encoding:
 
 ```
 curl http://127.0.0.1:8888/?text=これはテストです。
 ```
 
-### GET (URL encoded)
+### GET Request (URL Encoded)
+
+Send a text query with URL encoding:
 
 ```
 curl http://127.0.0.1:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
 ```
 
-### POST (Request body is JSON)
+### POST Request (JSON Body)
+
+Send text in a JSON request body:
 
 ```
 curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテストです。\"}" http://127.0.0.1:8888/
 ```
 
-### POST (Request body is URL Encoded)
+### POST Request (URL Encoded Body)
+
+Send a URL-encoded string in the JSON body:
 
 ```
 curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82\"}" http://127.0.0.1:8888/
 ```
 
+### Expected Response
 
-### Expected response
+The server returns a JSON response with the following structure:
 
 ```
-{"message": "ok", "time": "2024-05-26T23:21:38", "text": "これはテストです。", "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ... 0.022928446531295776]}
-```
-
-
-## REST API
-
-The REST API interface allows this server to be easily accessed from applications written in different programming languages. This interoperability makes it highly versatile for various development environments.
-
-- **GET Request**:
-  ```bash
-  curl "http://127.0.0.1:8888/?text=これはテストです。"
-  ```
-  This request sends a text query to the server, which responds with the processed embeddings.
-
-- **POST Request**:
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"text":"これはテストです。"}' http://127.0.0.1:8888/
-  ```
-  This sends a JSON payload with the text to be processed, and the server responds with a JSON containing the embeddings.
-
-### Sample Response
-The response JSON includes the status message, current timestamp, the input text, and its corresponding sentence embeddings:
-```json
 {
   "message": "ok",
   "time": "2024-05-26T23:21:38",
@@ -93,15 +84,49 @@ The response JSON includes the status message, current timestamp, the input text
 }
 ```
 
-### Benefits of REST API Integration
+## REST API Overview
 
-- **Language Agnostic**: The REST API allows the server to be accessed from any programming language that can make HTTP requests, including JavaScript, Java, C#, Ruby, and more.
-- **Ease of Use**: Developers can integrate text processing capabilities into their applications without needing to understand the underlying Python code.
-- **Scalability**: The multithreaded nature of the server ensures it can handle multiple requests concurrently, making it suitable for production environments.
+This API enables easy integration into various applications through HTTP requests. The server supports both GET and POST methods.
 
-### Conclusion
+GET: Simple and fast for passing text as query parameters.
 
-This script demonstrates a straightforward yet powerful approach to creating a text processing server using Python. By leveraging the `sentence-transformers` library for generating embeddings and implementing a multithreaded HTTP server with a REST API interface, it efficiently handles text input and produces valuable output. The REST API integration ensures that this server can be seamlessly used from various programming languages and platforms, making it a versatile tool for a wide range of natural language processing tasks.
+POST: Ideal for structured data, allowing JSON payloads for complex requests.
+
+## Advantages of REST API Integration
+
+Language Independence: The API can be used with any programming language capable of sending HTTP requests (e.g., Python, Java, JavaScript, Ruby).
+
+Ease of Integration: No need to modify server-side code; the API is ready for immediate use.
+
+Scalability: Handles multiple concurrent requests, making it suitable for production workloads.
+
+# Conclusion
+
+This project offers a highly efficient solution for generating multilingual text embeddings. The REST API provides flexibility, making it a valuable tool for natural language processing tasks such as search, recommendation, and semantic analysis.
+
+This version improves readability and provides a more detailed explanation for users unfamiliar with the project or its functionality. Let me know if additional enhancements are needed!
+
+---
+
+
+# Overview of Multilingual E5 Embedding
+
+The Multilingual E5 Embedding, available on Hugging Face, is a large-scale language model designed for feature extraction in 94 languages.
+
+## Foundation and Training Data
+
+It uses a base of XLM-RoBERTa, trained on a diverse set of multilingual datasets, enhancing text encoding capabilities for various tasks like text retrieval and semantic similarity.
+
+## Performance and Applications
+
+The model achieves high performance across a variety of benchmarks, particularly in multilingual environments.
+
+## Implementation and Integration
+
+It is implemented with PyTorch and compatible with Sentence Transformers for easy integration into applications.
+
+For more details, you can view the full description on [the Hugging Face page](https://huggingface.co/intfloat/multilingual-e5-large) .
+
 
 
 
