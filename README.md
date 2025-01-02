@@ -1,7 +1,7 @@
 # Multilingual E5 Embedding Server
 
 
-##nlp4j-llm-embeddings-e5
+## nlp4j-llm-embeddings-e5
 
 A lightweight, REST API-powered server for generating multilingual embeddings using the E5 model. This server is built with sentence-transformers and provides an easy-to-use interface for text processing tasks.
 
