@@ -85,7 +85,8 @@ class HelloHttpServer(ThreadingMixIn, HTTPServer):
 
 def main():
     signal.signal(signal.SIGTERM, sig_handler)
-    ip = '127.0.0.1'
+#    ip = '127.0.0.1'
+    ip = '0.0.0.0'
     port = 8888
     args = sys.argv[1:]
     if len(args) == 1:
