@@ -1,3 +1,5 @@
+https://github.com/oyahiroki/nlp4j-llm-embeddings-e5
+
 # Multilingual E5 Embedding Server
 
 
