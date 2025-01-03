@@ -1,4 +1,4 @@
-https://github.com/oyahiroki/nlp4j-llm-embeddings-e5/docker/README.md
+https://github.com/oyahiroki/nlp4j-llm-embeddings-e5/tree/main/docker
 
 # HOW-TO-USE
 
