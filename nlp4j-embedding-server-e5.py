@@ -1,5 +1,9 @@
 # coding: utf-8
 
+# /embedding Embedding Server
+# /semanticsearch Semantic Search Server
+# / (default) Embedding Server
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs, unquote
 import json
@@ -10,6 +14,7 @@ import time
 import datetime
 import signal
 from sentence_transformers import SentenceTransformer, util
+import argparse
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -156,10 +161,13 @@ def main():
     signal.signal(signal.SIGTERM, sig_handler)
 #    ip = '127.0.0.1'
     ip = '0.0.0.0'
-    port = 8888
-    args = sys.argv[1:]
-    if len(args) == 1:
-        port = int(args[0])
+    
+    parser = argparse.ArgumentParser(description="nlp4j-embedding")
+    parser.add_argument("-p", "--port", type=int, default=8888, help="Port Number")
+    args = parser.parse_args()	
+    
+    port = args.port
+	
     print("http://" + ip + ":" + str(port) + "/embeddings?text=これはテストです。")
     print("http://" + ip + ":" + str(port) + "/embeddings?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82")
     print("curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"text\\\":\\\"これはテストです。\\\"}\" http://" + ip + ":" + str(port) + "/embeddings")
