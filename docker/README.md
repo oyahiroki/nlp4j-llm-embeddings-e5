@@ -2,6 +2,13 @@ https://github.com/oyahiroki/nlp4j-llm-embeddings-e5/tree/main/docker
 
 # HOW-TO-USE
 
+# 0. Installation
+
+```
+git clone https://github.com/oyahiroki/nlp4j-llm-embeddings-e5.git
+```
+
+
 # 1. BUILD
 
 ```
