@@ -11,9 +11,11 @@ git clone https://github.com/oyahiroki/nlp4j-llm-embeddings-e5.git
 
 # 1. BUILD
 
+
 ```
-docker build -t img_nlp4j-llm-embeddings-e5 .
+$ docker build --no-cache -t oyahiroki/nlp4j-llm-embeddings-e5:1.0.0.0.20250303 ./nlp4j-llm-embeddings-e5/docker
 ```
+
 
 # 2. RUN
 
