@@ -2,10 +2,22 @@ https://github.com/oyahiroki/nlp4j-llm-embeddings-e5
 
 # Multilingual E5 Embedding Server
 
+[Japanese 日本語](README_ja.md)
 
 ## nlp4j-llm-embeddings-e5
 
 A lightweight, REST API-powered server for generating multilingual embeddings using the E5 model. This server is built with sentence-transformers and provides an easy-to-use interface for text processing tasks.
+
+## Key Features
+
+### 1. Embeddings API (`/embeddings`)
+Convert text into vector embeddings for document search. Automatically applies E5's "passage:" prefix for optimal performance.
+
+### 2. Semantic Search API (`/semantic_search`)
+Perform semantic search between queries and corpus. Automatically applies "query:" prefix for queries and "passage:" prefix for corpus documents.
+
+### 3. Cosine Similarity API (`/cos_sim`)
+Calculate cosine similarity between two texts without prefixes.
 
 ## Prerequisites 
 
@@ -43,56 +55,157 @@ pip install -r requirements.txt
 
 Start the server with the following command:
 
-```
+```bash
 python3 nlp4j-embedding-server-e5.py
+```
+
+### Command Line Options
+
+- `--host`: Bind host (default: 127.0.0.1)
+- `-p, --port`: Port number (default: 8888)
+
+Example:
+```bash
+python3 nlp4j-embedding-server-e5.py --host 0.0.0.0 --port 9000
 ```
 
 ## API Usage
 
 The server provides a REST API for sending text and receiving its embeddings. Below are usage examples for GET and POST requests.
 
-### GET Request (Plain Text)
+### Embeddings API
+
+#### GET Request (Plain Text)
 
 Send a plain text query without encoding:
 
-```
-curl http://127.0.0.1:8888/?text=これはテストです。
+```bash
+curl http://127.0.0.1:8888/embeddings?text=これはテストです。
 ```
 
-### GET Request (URL Encoded)
+#### GET Request (URL Encoded)
 
 Send a text query with URL encoding:
 
-```
-curl http://127.0.0.1:8888/?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
+```bash
+curl http://127.0.0.1:8888/embeddings?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
 ```
 
-### POST Request (JSON Body)
+#### POST Request (JSON Body)
 
 Send text in a JSON request body:
 
-```
-curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテストです。\"}" http://127.0.0.1:8888/
-```
-
-### POST Request (URL Encoded Body)
-
-Send a URL-encoded string in the JSON body:
-
-```
-curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82\"}" http://127.0.0.1:8888/
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"text":"これはテストです。"}' \
+  http://127.0.0.1:8888/embeddings
 ```
 
-### Expected Response
+#### Request with Token Count Check
+
+```bash
+curl http://127.0.0.1:8888/embeddings?text=これはテストです。&checktokencount=true
+```
+
+#### Expected Response
 
 The server returns a JSON response with the following structure:
 
-```
+```json
 {
   "message": "ok",
   "time": "2024-05-26T23:21:38",
   "text": "これはテストです。",
-  "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ... 0.022928446531295776]
+  "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, ...]
+}
+```
+
+With token count check:
+```json
+{
+  "message": "ok",
+  "time": "2024-05-26T23:21:38",
+  "text": "これはテストです。",
+  "token_count": 15,
+  "max_tokens": 512,
+  "truncated": false,
+  "embeddings": [...]
+}
+```
+
+### Semantic Search API
+
+#### GET Request
+
+```bash
+curl "http://127.0.0.1:8888/semantic_search?text1=これはテストです。&text2=これは試験です。"
+```
+
+#### POST Request (Multiple Documents)
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"text":"これはテストです。","texts":["これは試験です。","これは検査です。"]}' \
+  http://127.0.0.1:8888/semantic_search
+```
+
+#### Expected Response
+
+```json
+{
+  "message": "ok",
+  "time": "2024-05-26T23:21:38",
+  "text": "これはテストです。",
+  "r": [
+    {"corpus_id": 0, "score": 0.8234},
+    {"corpus_id": 1, "score": 0.7891}
+  ]
+}
+```
+
+### Cosine Similarity API
+
+#### GET Request
+
+```bash
+curl "http://127.0.0.1:8888/cos_sim?text1=これはテストです。&text2=これは試験です。"
+```
+
+#### POST Request
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"text1":"これはテストです。","text2":"これは試験です。"}' \
+  http://127.0.0.1:8888/cos_sim
+```
+
+#### Request with Token Count Check
+
+```bash
+curl "http://127.0.0.1:8888/cos_sim?text1=これはテストです。&text2=これは試験です。&checktokencount=true"
+```
+
+#### Expected Response
+
+```json
+{
+  "text1": "これはテストです。",
+  "text2": "これは試験です。",
+  "cosine_similarity": 0.8234567
+}
+```
+
+With token count check:
+```json
+{
+  "text1": "これはテストです。",
+  "text2": "これは試験です。",
+  "max_tokens": 512,
+  "token_count1": 15,
+  "token_count2": 14,
+  "truncated1": false,
+  "truncated2": false,
+  "cosine_similarity": 0.8234567
 }
 ```
 
@@ -112,11 +225,33 @@ Ease of Integration: No need to modify server-side code; the API is ready for im
 
 Scalability: Handles multiple concurrent requests, making it suitable for production workloads.
 
-# Conclusion
+## Docker Support
 
-This project offers a highly efficient solution for generating multilingual text embeddings. The REST API provides flexibility, making it a valuable tool for natural language processing tasks such as search, recommendation, and semantic analysis.
+### Build Docker Image
 
-This version improves readability and provides a more detailed explanation for users unfamiliar with the project or its functionality. Let me know if additional enhancements are needed!
+```bash
+docker build -t nlp4j-llm-embeddings-e5 ./docker
+```
+
+Or with a specific version tag:
+
+```bash
+docker build --no-cache -t oyahiroki/nlp4j-llm-embeddings-e5:1.0.0.0 ./docker
+```
+
+### Run Container
+
+```bash
+docker run -d --name nlp4j-llm-embeddings-e5 -p 8888:8888 nlp4j-llm-embeddings-e5
+```
+
+### Test
+
+```bash
+curl http://127.0.0.1:8888/embeddings?text=%E3%81%93%E3%82%8C%E3%81%AF%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E3%81%99%E3%80%82
+```
+
+For more details, see [docker/README.md](docker/README.md).
 
 ---
 
@@ -177,10 +312,119 @@ $
 
 The time taken for embedding was 0.05 - 0.1 seconds when using the NVIDIA GeForce RTX 3060 Ti.
 
-```
-$ curl -w"time_total: %{time_total}\n" -X POST -H "Content-Type: application/json" -d "{\"text\":\"これはテストです。\"}" http://127.0.0.1:8888/
-{"message": "ok", "time": "2024-07-19T16:25:52", "text": "\u3053\u308c\u306f\u30c6\u30b9\u30c8\u3067\u3059\u3002", "embeddings": [0.04231283441185951, -0.0035561583936214447, -0.014567600563168526, -0.057356465607881546, 0.033991988748311996, -0.023742299526929855, 0.006811152212321758, 0.08303837478160858, 0.04199839010834694, ... -0.02498556673526764, -0.03213634714484215, 0.022928446531295776]}time_total: 0.058588
+```bash
+$ curl -w"time_total: %{time_total}\n" -X POST -H "Content-Type: application/json" \
+  -d '{"text":"これはテストです。"}' http://127.0.0.1:8888/embeddings
 
+{"message": "ok", "time": "2024-07-19T16:25:52", "text": "これはテストです。",
+ "embeddings": [0.04231283441185951, -0.0035561583936214447, ...]}
+time_total: 0.058588
+```
+
+## Test Scripts
+
+The project includes sample scripts to test the API:
+
+### Test Embeddings
+
+```bash
+python3 bin/nlp4j-embedding-server-e5-test-embedding.py
+```
+
+### Test Cosine Similarity
+
+```bash
+python3 bin/nlp4j-embedding-server-e5-test-cos_sim.py
+```
+
+## Utility Tools
+
+### Local Embedding Processing
+
+Tool for batch processing JSONL files:
+
+```bash
+python3 bin/nlp4j-embedding-local-e5.py input.jsonl output.jsonl \
+  --text-attr text --vector-attr vector
+```
+
+## Project Structure
 
 ```
+nlp4j-llm-embeddings-e5/
+├── nlp4j-embedding-server-e5.py          # Main server
+├── requirements.txt                       # Dependencies
+├── README.md                              # English README
+├── README_ja.md                           # Japanese README
+├── LICENSE.txt                            # Apache License 2.0
+├── bin/                                   # Utilities and test scripts
+│   ├── nlp4j_embedding_server_requesthandler.py  # Request handler
+│   ├── nlp4j-embedding-server-e5-test-embedding.py
+│   ├── nlp4j-embedding-server-e5-test-cos_sim.py
+│   ├── nlp4j-embedding-local-e5.py
+│   └── nlp4j-embedding-local-openai.py
+├── docker/                                # Docker configuration
+│   ├── Dockerfile
+│   └── README.md
+├── html/                                  # Web interface
+│   └── index.html
+└── bak/                                   # Backup files
+```
+
+## Technical Specifications
+
+- **Model**: intfloat/multilingual-e5-large
+- **Base Model**: XLM-RoBERTa
+- **Supported Languages**: 94 languages
+- **Max Tokens**: 512
+- **Embedding Dimension**: 1024
+- **Normalization**: L2 normalized
+
+## E5 Prefixes
+
+The E5 model uses specific prefixes for optimal performance:
+
+- **passage:**: For document/corpus embeddings (search targets)
+- **query:**: For query embeddings (search sources)
+
+This server automatically applies these prefixes at the appropriate endpoints.
+
+## Troubleshooting
+
+### Model Download Takes Time
+
+On first startup, the model will be automatically downloaded (~2GB). This only happens once.
+
+### Out of Memory Errors
+
+- GPU usage: Minimum 8GB VRAM recommended
+- CPU usage: Minimum 8GB RAM recommended
+
+### Port Already in Use
+
+Specify a different port:
+```bash
+python3 nlp4j-embedding-server-e5.py --port 9000
+```
+
+## License
+
+Apache License 2.0
+
+Copyright 2024 Hiroki Oya (NLP4J)
+
+See [LICENSE.txt](LICENSE.txt) for details.
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Support
+
+If you have any issues or questions, please create a GitHub issue:
+https://github.com/oyahiroki/nlp4j-llm-embeddings-e5/issues
+
+## Conclusion
+
+This project offers a highly efficient solution for generating multilingual text embeddings. The REST API provides flexibility, making it a valuable tool for natural language processing tasks such as search, recommendation, and semantic analysis.
 
